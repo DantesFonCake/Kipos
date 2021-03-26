@@ -1,0 +1,12 @@
+form {
+    background-color: white;
+}
+li {
+    background-color: white;
+}
+li a {
+    color: green;
+}
+body {
+    background: white url("images/background.gif");
+}
