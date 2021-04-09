@@ -1,6 +1,6 @@
 import json
 import random
-
+import board_settings
 
 # TODO
 def set_up():
@@ -9,12 +9,20 @@ def set_up():
 
 # TODO
 def read_temperature():
-    return random.random() * 50
+    count=0
+    temp_sum=0
+    for temp_sensor in board_settings.sensors_pin_list:
+        temp_sum+=temp_sensor.read()["temp_c"]
+    return temp_sum/count
 
 
 # TODO
 def read_humidity():
-    return random.random() * 100
+    count = 0
+    humidity_sum = 0
+    for humidity_sensor in board_settings.sensors_pin_list:
+        humidity_sum += humidity_sensor.read()["humidity"]
+    return humidity_sum / count
 
 
 # TODO
@@ -29,12 +37,24 @@ def read_concentrate_level():
 
 # TODO
 def set_pulverizer_state(state):
-    pass
+    if state:
+        board_settings.pulverizer_out_pin.on()
+    else:
+        board_settings.pulverizer_out_pin.off()
 
 
 # TODO
 def set_heater_state(state):
-    pass
+    if state:
+        board_settings.heater_out_pin.on()
+    else:
+        board_settings.heater_out_pin.off()
+
+def set_lights_state(state):
+    if state:
+        board_settings.lights_out_pin.on()
+    else:
+        board_settings.lights_out_pin.off()
 
 
 def get_telemtry_jstring():
