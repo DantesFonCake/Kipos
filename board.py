@@ -2,48 +2,42 @@ import json
 import random
 import board_settings
 
+board_initialized=False
+
 # TODO
 def set_up():
-    pass
-
-
-# TODO
-def read_temperature():
-    count=0
-    temp_sum=0
-    for temp_sensor in board_settings.sensors_pin_list:
-        temp_sum+=temp_sensor.read()["temp_c"]
-    return temp_sum/count
-
+    global board_initialized
+    if not board_initialized:
+        board_initialized=True
 
 # TODO
-def read_humidity():
+def get_sensors_data():
     count = 0
     humidity_sum = 0
+    temperature_sum=0
     for humidity_sensor in board_settings.sensors_pin_list:
-        humidity_sum += humidity_sensor.read()["humidity"]
+        data=humidity_sensor.read()
+        humidity_sum += data["humidity"]
+        temperature_sum+=data["temp_c"]
+        count+=1
     return humidity_sum / count
 
 
-# TODO
+# TODO put it in to get_sensors_data
 def read_water_level():
     return random.random()
 
 
-# TODO
+# TODO put it in to get_sensors_data
 def read_concentrate_level():
     return random.random()
 
-
-# TODO
 def set_pulverizer_state(state):
     if state:
         board_settings.pulverizer_out_pin.on()
     else:
         board_settings.pulverizer_out_pin.off()
 
-
-# TODO
 def set_heater_state(state):
     if state:
         board_settings.heater_out_pin.on()
@@ -56,10 +50,11 @@ def set_lights_state(state):
     else:
         board_settings.lights_out_pin.off()
 
-
-def get_telemtry_jstring():
+def get_telemetry_jstring(data=None):
+    if(data==None):
+        data=get_sensors_data()
     return json.dumps(
-            {"temperature"      : read_temperature(), "humidity": read_humidity(), "water_level": read_water_level(),
+            {"temperature"      : data["temp_c"], "humidity": data["humidity"], "water_level": read_water_level(),
              "concentrate_level": read_concentrate_level()})
 
 
