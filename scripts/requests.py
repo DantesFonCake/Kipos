@@ -29,7 +29,12 @@ class Response:
 
     def json(self):
         import ujson
-        return ujson.loads(self.content)
+        try:
+            data=str(self.content,'ASCII')
+            return ujson.loads(data)
+        except Exception as e:
+            print(str(type(e)))
+            return {}
 
 
 def request(method, url, data=None, json=None, headers={}, stream=None):
@@ -76,9 +81,7 @@ def request(method, url, data=None, json=None, headers={}, stream=None):
         s.write(b"\r\n")
         if data:
             s.write(data)
-
         l = s.readline()
-        #print(l)
         l = l.split(None, 2)
         status = int(l[1])
         reason = ""
@@ -94,7 +97,8 @@ def request(method, url, data=None, json=None, headers={}, stream=None):
                     raise ValueError("Unsupported " + l)
             elif l.startswith(b"Location:") and not 200 <= status <= 299:
                 raise NotImplementedError("Redirects not yet supported")
-    except OSError:
+    except OSError as e:
+        print('OSError'+str(e))
         s.close()
         raise
 

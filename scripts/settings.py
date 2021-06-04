@@ -1,5 +1,6 @@
 import ujson
 
+last_update_time=None
 initialized=False
 timezone=0
 wifi_ssid=None
@@ -10,7 +11,7 @@ target_humidity = 95
 start_time = 7
 end_time = 21
 file_changed = False
-uuid = 0
+uuid = 1
 data = {}
 
 def rewrite_settings_file():
@@ -42,7 +43,7 @@ def on_boot():
 def reassign_data():
     global target_humidity, target_temperature, start_time, end_time, \
         file_changed, data, uuid, initialized, wifi_ssid, \
-        wifi_password, module_name, timezone
+        wifi_password, module_name, timezone, last_update_time
     print(__name__ + ": Settings file reading")
     s = open("settings_json.txt", "r")
     data = ujson.load(s)
@@ -58,6 +59,8 @@ def reassign_data():
     target_humidity = data["climate_settings"]["target_humidity"]
     start_time = data["climate_settings"]["start_time"]
     end_time = data["climate_settings"]["end_time"]
+    if "last_update_time" in data:
+        last_update_time=int(data["last_update_time"])
     print(__name__ + ": Settings boot ended")
 
 

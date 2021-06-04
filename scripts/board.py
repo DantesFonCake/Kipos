@@ -39,12 +39,12 @@ def get_sensors_data():
 
 # TODO put it in to get_sensors_data
 def read_water_level():
-    pass
+    return 0
 
 
 # TODO put it in to get_sensors_data
 def read_concentrate_level():
-    pass
+    return 0
 
 
 def set_pulverizer_state(state):
@@ -75,7 +75,9 @@ def get_telemetry_jstring(data = None):
             {"telemetry":
                  {"temperature"      : data["temp_c"], "humidity": data["humidity"], "water_level": read_water_level(),
                   "concentrate_level": read_concentrate_level()},
-             "uuid"     : settings.uuid})
+             "settings":settings.data,
+             "uuid"     : settings.uuid,
+             })
 
 
 set_up()
