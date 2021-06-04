@@ -9,5 +9,7 @@ urlpatterns = [
     path('register', views.register, name = 'register'),
     path('logout', views.logout, name = 'logout'),
     path('allmodules', views.allmodules,name='modulelist'),
-    path('addmodule',views.addmodule,name='addmodule')
+    path('addmodule',views.addmodule,name='addmodule'),
+    path('module/update',views.update,name='update'),
+    path('connection_check',views.check_connection,name='connection_check')
 ]

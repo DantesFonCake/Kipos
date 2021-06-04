@@ -2,7 +2,6 @@ import uuid
 
 from django.contrib.auth.base_user import AbstractBaseUser, BaseUserManager
 from django.db import models
-from jsonfield import fields
 
 
 # Create your models here.
@@ -67,8 +66,9 @@ class KiposUser(AbstractBaseUser):
 class Module(models.Model):
     user = models.ForeignKey(KiposUser, on_delete = models.CASCADE)
     name = models.CharField(max_length = 40,default = 'module')
-    telemetry = fields.JSONField()
-    settings = fields.JSONField(default = '{a:\'a\'}')
+    uuid=models.IntegerField(unique = True)
+    telemetry =models.JSONField()
+    settings = models.JSONField()
 
     def __str__(self):
         return self.user.uuid+" "+self.user.username+" "+str(self.id)

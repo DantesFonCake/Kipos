@@ -1,14 +1,54 @@
+import json
+import logging
+import time
+import uuid
+from datetime import datetime
+
 from django.contrib.auth import login as auth, logout as logoutdj
 from django.contrib.auth.forms import AuthenticationForm
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
-# Create your views here.
 from django.template import RequestContext
 from django.urls import reverse
 from django.views import View
+from django.views.decorators.csrf import csrf_exempt
 
 from .forms import KiposUserCreationForm
 from .models import KiposUser, Module
+
+logger=logging.getLogger(__name__)
+def check_connection(request):
+    #logger.log(logging.DEBUG,"connection_check")
+    return HttpResponse()
+
+@csrf_exempt
+def update(request):
+    if request.method=='POST':
+        data=json.loads(request.body)
+        if 'uuid' in data:
+            changed=False
+            need_settings_update=False
+            module=Module.objects.get(uuid=data['uuid'])
+            #logger.log(logging.DEBUG, data)
+            if 'telemetry' in data:
+                changed=True
+                module.telemetry=data['telemetry']
+
+            if 'settings' in data:
+                if 'last_update_time' in data['settings']:
+                    if data['settings']['last_update_time']==-1:
+
+                    if module.settings['last_update_time']<data['settings']['last_update_time']:
+                        module.settings=data['settings']
+                        changed=True
+
+            if changed:
+                module.save()
+            data=json.dumps(module.settings)
+            return HttpResponse(content = bytes(data,'ASCII'))
+        return HttpResponse('No uuid in content')
+    return HttpResponse('Wrong method')
+
 
 
 def addmodule(request):
@@ -18,10 +58,12 @@ def addmodule(request):
                 name=request.POST['name']
                 telemetry=request.POST['telemetry']
                 settings=request.POST['settings']
+                last_update=time.time()
             except:
                 return HttpResponse('404')
-            Module.objects.create(user=request.user,name=name,telemetry=telemetry,settings=settings)
-            return HttpResponse('200')
+            id=uuid.uuid4()
+            Module.objects.create(user=request.user,last_update=last_update,uuid=id,name=name,telemetry=telemetry,settings=settings)
+            return HttpResponse('200',content = f'{{uuid:{id}}}' )
     return render(request,'kipos/moduleaddform.html')
 
 

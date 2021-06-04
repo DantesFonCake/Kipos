@@ -18,6 +18,5 @@ from django.urls import include,path
 
 urlpatterns = [
     path('kipos/',include('kipos.urls')),
-    path('polls/', include('pollapp.urls')),
     path('admin/', admin.site.urls),
 ]

@@ -9,7 +9,7 @@ https://docs.djangoproject.com/en/3.1/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.1/ref/settings/
 """
-
+import logging
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -25,14 +25,13 @@ SECRET_KEY = 'fks@stt#ktaw(3(v78eh544wb*z(ffa&6h84(y@-ija$jn48%h'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["casper","127.0.0.1"]
+ALLOWED_HOSTS = ["casper","127.0.0.1","*"]
 
 
 # Application definition
 
 INSTALLED_APPS = [
     'kipos.apps.KiposConfig',
-    'pollapp.apps.PollappConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -142,3 +141,18 @@ AUTHENTICATION_BACKENDS=['django.contrib.auth.backends.ModelBackend',
 
 #Login redirect
 LOGIN_REDIRECT_URL = '/kipos/main'
+
+if DEBUG:
+    # will output to your console
+    logging.basicConfig(
+        level = logging.DEBUG,
+        format = '%(asctime)s - %(levelname)s: %(message)s',
+    )
+else:
+    # will output to logging file
+    logging.basicConfig(
+        level = logging.DEBUG,
+        format = '%(asctime)s %(levelname)s %(message)s',
+        filename = '/logs.log',
+        filemode = 'a'
+    )
