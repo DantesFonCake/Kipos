@@ -37,7 +37,9 @@ def update(request):
             if 'settings' in data:
                 if 'last_update_time' in data['settings']:
                     if data['settings']['last_update_time']==-1:
-
+                        module.settings=data['settings']
+                        module.settings['last_update_settings']=int(time.time())
+                        changed=True
                     if module.settings['last_update_time']<data['settings']['last_update_time']:
                         module.settings=data['settings']
                         changed=True
@@ -49,7 +51,15 @@ def update(request):
         return HttpResponse('No uuid in content')
     return HttpResponse('Wrong method')
 
-
+def deletemodule(request):
+    if request.method=='POST':
+        if request.user.is_authenticated:
+            try:
+                Module.objects.get(uuid=request.POST['uuid']).delete()
+            except:
+                return HttpResponse('failed to delete module')
+            return HttpResponse('deleted')
+    return HttpResponse()
 
 def addmodule(request):
     if request.method=='POST':

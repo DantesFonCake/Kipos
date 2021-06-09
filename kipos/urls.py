@@ -11,5 +11,6 @@ urlpatterns = [
     path('allmodules', views.allmodules,name='modulelist'),
     path('addmodule',views.addmodule,name='addmodule'),
     path('module/update',views.update,name='update'),
-    path('connection_check',views.check_connection,name='connection_check')
+    path('connection_check',views.check_connection,name='connection_check'),
+    path('module/delete',views.deletemodule,name='deletemodule'),
 ]
