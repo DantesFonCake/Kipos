@@ -25,7 +25,7 @@ def check_connection(request):
 def update(request):
     if request.method=='POST':
         data=json.loads(request.body)
-        if 'uuid' in data:
+        if 'uuid' in data and data['uuid']!=-1:
             changed=False
             need_settings_update=False
             module=Module.objects.get(uuid=data['uuid'])
