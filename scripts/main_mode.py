@@ -172,7 +172,7 @@ def networking_routine():
     if time - networking_time > networking_interval:
         print(__name__ + ": Checking internet connection")
         try:
-            if mc_server_protocol.check_connection():
+            if settings.uuid!=-1 and mc_server_protocol.check_connection():
                 is_local_mode=False
                 print(__name__ + ": Have connection")
                 while is_file_in_use:
