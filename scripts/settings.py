@@ -11,7 +11,7 @@ target_humidity = 95
 start_time = 7
 end_time = 21
 file_changed = False
-uuid = 1
+uuid = -1
 data = {}
 
 def rewrite_settings_file():

@@ -96,6 +96,9 @@ def apply_data(data):
             settings.data["climate_settings"][k] = data["climate_settings"][k]
         climate_changed = True
 
+    if "uuid" in data:
+        settings.uuid=data["uuid"]
+
     if climate_changed or mc_changed:
         settings.data["last_update_time"]=time
         settings.rewrite_settings_file()
