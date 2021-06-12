@@ -67,6 +67,7 @@ class Module(models.Model):
     user = models.ForeignKey(KiposUser, on_delete = models.CASCADE)
     name = models.CharField(max_length = 40,default = 'module')
     uuid=models.IntegerField(unique = True)
+    forced_local_mode=models.BooleanField(default = False)
     telemetry =models.JSONField()
     settings = models.JSONField()
 

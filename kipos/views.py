@@ -18,8 +18,10 @@ from .models import KiposUser, Module
 
 logger=logging.getLogger(__name__)
 def check_connection(request):
-    #logger.log(logging.DEBUG,"connection_check")
-    return HttpResponse()
+    if request.method=='POST':
+        if 'uuid' in request.POST:
+            return HttpResponse(True and ~Module.objects.get(uuid=request.POST['uuid']).forced_local_mode)
+    return HttpResponse(False)
 
 @csrf_exempt
 def update(request):
