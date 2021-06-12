@@ -15,7 +15,7 @@ def get_settings():
 def check_connection():
     try:
         resp=requests.get(server_url+'/connection_check')
-        resp.close()
-        return resp.status_code<400
+        answer=resp.content
+        return bool(answer)
     except Exception:
         return False
