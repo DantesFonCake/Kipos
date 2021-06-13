@@ -19,7 +19,7 @@ from .models import KiposUser, Module
 logger=logging.getLogger(__name__)
 def check_connection(request):
     if request.method=='POST':
-        if 'uuid' in request.POST:
+        if 'uuid' in request.POST and request.POST['uuid']!=-1:
             return HttpResponse(True and ~Module.objects.get(uuid=request.POST['uuid']).forced_local_mode)
     return HttpResponse(False)
 
