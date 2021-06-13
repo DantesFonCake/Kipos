@@ -1,5 +1,5 @@
 import  requests
-
+import settings
 server_url = 'http://192.168.0.6:8080/kipos'
 
 
@@ -14,7 +14,7 @@ def get_settings():
 
 def check_connection():
     try:
-        resp=requests.get(server_url+'/connection_check')
+        resp=requests.post(server_url+"/connection_check",json=f'"uuid":{settings.uuid}')
         answer=resp.content
         return bool(answer)
     except Exception:
