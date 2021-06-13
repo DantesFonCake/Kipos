@@ -29,7 +29,6 @@ def update(request):
         data=json.loads(request.body)
         if 'uuid' in data and data['uuid']!=-1:
             changed=False
-            need_settings_update=False
             module=Module.objects.get(uuid=data['uuid'])
             #logger.log(logging.DEBUG, data)
             if 'telemetry' in data:
@@ -45,6 +44,10 @@ def update(request):
                     if module.settings['last_update_time']<data['settings']['last_update_time']:
                         module.settings=data['settings']
                         changed=True
+
+            if 'forced_local_mode' in data:
+                module.forced_local_mode=data['forced_local_mode']
+                changed=True
 
             if changed:
                 module.save()
