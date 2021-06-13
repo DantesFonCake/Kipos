@@ -74,8 +74,8 @@ def get_broadcst_ip(wifi):
 def apply_data(data):
     print(__name__+": Applying data")
 
-    climate_changed = False
-    mc_changed=False
+    file_changed = False
+    need_restart = False
 
     if "last_update_time" not in data:
         print(__name__+": Time were not provided")
@@ -87,23 +87,25 @@ def apply_data(data):
         return
 
     if "mc_settings" in data:
-        mc_changed = True
+        need_restart = True
+        file_changed=True
         for k in data["mc_settings"]:
             settings.data["mc_settings"][k] = data["mc_settings"][k]
 
     if "climate_settings" in data:
         for k in data["climate_settings"]:
             settings.data["climate_settings"][k] = data["climate_settings"][k]
-        climate_changed = True
+        file_changed = True
 
     if "uuid" in data:
         settings.uuid=data["uuid"]
+        file_changed=True
 
-    if climate_changed or mc_changed:
+    if file_changed:
         settings.data["last_update_time"]=time
         settings.rewrite_settings_file()
         settings.reassign_data()
-    if mc_changed:
+    if need_restart:
         leave()
 
 
@@ -172,7 +174,7 @@ def networking_routine():
     if time - networking_time > networking_interval:
         print(__name__ + ": Checking internet connection")
         try:
-            if settings.uuid!=-1 and mc_server_protocol.check_connection():
+            if ~is_in_access_mode and settings.uuid!=-1 and mc_server_protocol.check_connection():
                 is_local_mode=False
                 print(__name__ + ": Have connection")
                 while is_file_in_use:
@@ -210,27 +212,30 @@ def networking_routine():
 
 def enter():
     global broadcast_ip, is_local_mode, is_in_access_mode, wifi, ap
-    wifi.active(True)
-    while not wifi.active():
-        pass
-    print(__name__ + ": Activated Wi-Fi adapter")
-    wifi.connect(settings.wifi_ssid, settings.wifi_password)
-    timeout = 0
-    while not wifi.isconnected():
-        if timeout > 100:
-            print(__name__ + ": Failed to connect")
-            ap.active(True)
-            is_in_access_mode = True
-            break
-        utime.sleep_ms(200)
-        timeout += 1
-    print(__name__ + ": Wi-Fi connected")
-    print(__name__ + ": Try setting time")
-    try:
-        ntptime.settime()
-        print(__name__ + ": Time set")
-    except:
-        print(__name__ + ": Exception in setting real time")
+    if settings.wifi_ssid!=None:
+        wifi.active(True)
+        while not wifi.active():
+            pass
+        print(__name__ + ": Activated Wi-Fi adapter")
+        wifi.connect(settings.wifi_ssid, settings.wifi_password)
+        timeout = 0
+        while not wifi.isconnected():
+            if timeout > 100:
+                print(__name__ + ": Failed to connect")
+                ap.active(True)
+                is_in_access_mode = True
+                break
+            utime.sleep_ms(200)
+            timeout += 1
+        print(__name__ + ": Wi-Fi connected")
+        print(__name__ + ": Try setting time")
+        try:
+            ntptime.settime()
+            print(__name__ + ": Time set")
+        except:
+            print(__name__ + ": Exception in setting real time")
+    else:
+        is_in_access_mode=True
     while is_on:
         sensoring_routine()
         networking_routine()

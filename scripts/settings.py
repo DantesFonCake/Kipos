@@ -21,19 +21,6 @@ def rewrite_settings_file():
     s.close()
     print(__name__ + ": Rewrote settings file")
 
-def set_initialization_settings(name:str, ssid:str,password:str,tz:int):
-    global data,wifi_ssid,wifi_password,module_name,initialized,timezone
-    data["mc_settings"]["name"] = name
-    data["mc_settings"]["ssid"]=ssid
-    data["mc_settings"]["password"]=password
-    data["mc_settings"]["time_zone"] = tz
-    data["mc_settings"]["initialized"]=True
-    initialized=True
-    timezone=tz
-    module_name=name
-    wifi_ssid=ssid
-    wifi_password=password
-    rewrite_settings_file()
 
 def on_boot():
     print(__name__ + ": Settings boot started")
@@ -49,18 +36,15 @@ def reassign_data():
     data = ujson.load(s)
     s.close()
     print(__name__ + ": Settings file read")
-    initialized = data["mc_settings"]["initialized"]
-    if initialized:
-        wifi_ssid = data["mc_settings"]["ssid"]
-        wifi_password = data["mc_settings"]["password"]
-        module_name = data["mc_settings"]["name"]
-        timezone = int(data["mc_settings"]["time_zone"])
-    target_temperature = data["climate_settings"]["target_temperature"]
-    target_humidity = data["climate_settings"]["target_humidity"]
-    start_time = data["climate_settings"]["start_time"]
-    end_time = data["climate_settings"]["end_time"]
-    if "last_update_time" in data:
-        last_update_time=int(data["last_update_time"])
+    wifi_ssid = data["mc_settings"].get("ssid",None)
+    wifi_password = data["mc_settings"].get("password",None)
+    module_name = data["mc_settings"].get("name","Module")
+    timezone = int(data["mc_settings"].get("time_zone",0))
+    target_temperature = data["climate_settings"].get("target_temperature",30)
+    target_humidity = data["climate_settings"].get("target_humidity",90)
+    start_time = data["climate_settings"].get("start_time",7)
+    end_time = data["climate_settings"].get("end_time",22)
+    last_update_time=int(data.get("last_update_time",0))
     print(__name__ + ": Settings boot ended")
 
 
