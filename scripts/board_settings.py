@@ -2,7 +2,7 @@ print("importing machine")
 
 from machine import Pin
 print("importing dht")
-def reset_callback():
+def reset_callback(pin):
     import main_mode
     main_mode.leave()
 
