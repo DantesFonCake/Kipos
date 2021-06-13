@@ -2,6 +2,9 @@ print("importing machine")
 
 from machine import Pin
 print("importing dht")
+def reset_callback():
+    import main_mode
+    main_mode.leave()
 
 import dht
 print("imported dht")
@@ -19,4 +22,7 @@ pulverizer_out_pin = Pin(14, Pin.OUT, value = 0)
 print("pulverizer out pin created")
 lights_out_pin = Pin(15, Pin.OUT, value = 0)
 print("lights out pin created")
+reset_interrupt_pin=Pin(25,Pin.IN,Pin.PULL_UP)
+reset_interrupt_pin.irq(reset_callback,Pin.IRQ_FALLING)
+
 debug_pin=Pin(2,Pin.OUT,value = 0)
