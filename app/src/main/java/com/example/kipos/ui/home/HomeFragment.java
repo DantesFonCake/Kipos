@@ -38,7 +38,10 @@ public class HomeFragment extends Fragment {
 //        recyclerView.setAdapter(new ModuleAdapter(root.getContext(), /*взять лист модулей из телеметрии*/));
 
         return root;
+
+
     }
+
 
     @Override
     public void onDestroyView() {

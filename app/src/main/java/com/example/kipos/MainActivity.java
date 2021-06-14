@@ -6,9 +6,11 @@ import android.view.Menu;
 import android.widget.Toast;
 
 import com.example.kipos.localnetwork.ClientSocket;
+import com.example.kipos.ui.home.HomeFragment;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.navigation.NavigationView;
 
+import androidx.fragment.app.Fragment;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
@@ -18,12 +20,21 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.kipos.databinding.ActivityMainBinding;
 
+import java.io.IOException;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
+import java.net.SocketException;
+import java.net.UnknownHostException;
+import java.util.Arrays;
+
 public class MainActivity extends AppCompatActivity {
 
     private AppBarConfiguration mAppBarConfiguration;
     private ActivityMainBinding binding;
     private ClientSocket client;
     private AppCompatActivity MainActivity;
+    private Fragment HomeFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,25 +70,34 @@ public class MainActivity extends AppCompatActivity {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                client = new ClientSocket(new ClientSocket.OnMessageReceived() {
-                    @Override
-                    public void onConnected() {
-
-                    }
-
-                    @Override
-                    public void messageReceived(String message) {
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                if (client.getSeverMessage() != null){
-                                    Toast.makeText(MainActivity, "message received", Toast.LENGTH_LONG).show();
+                try {
+                    client = new ClientSocket(new ClientSocket.OnMessageReceived() {
+                        @Override
+                        public void onConnected() {
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    client.connectToServer();
                                 }
-                            }
-                        });
-                    }
-                });
-                client.run();
+                            });
+                        }
+
+                        @Override
+                        public void messageReceived(String message) {
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    if (client.getServerMessage() != null){
+                                        Toast.makeText(MainActivity, "message received", Toast.LENGTH_LONG).show();
+                                    }
+                                }
+                            });
+                        }
+                    });
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                client.received(client.getSeverIp());
             }
         }).start();
     }

@@ -4,72 +4,132 @@ import android.widget.Toast;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.net.Socket;
+import java.net.SocketException;
+import java.net.UnknownHostException;
 import java.util.Arrays;
 
 
 public class ClientSocket {
 
-    private String severMessage;
+    private String severIp;
     private OnMessageReceived messageListener = null;
     private boolean mRun = false;
-    private DatagramSocket socket;
+    private DatagramSocket UdpSocket;
+    private PrintWriter bufferOut;
+    private BufferedReader bufferIn;
+    private Socket TcpSocket;
+    private String serverMessage;
 
-    public ClientSocket(OnMessageReceived messageListener) {
+    public ClientSocket(OnMessageReceived messageListener) throws IOException {
         this.messageListener = messageListener;
     }
 
-    public DatagramSocket getReceivedSocket() throws IOException {
-        if (socket == null){
-            socket = new DatagramSocket(8002, InetAddress.getByName("0.0.0.0"));
-            socket.setBroadcast(true);
+    public DatagramSocket getUdpSocket() throws IOException {
+        if (UdpSocket == null){
+            UdpSocket = new DatagramSocket(37020, InetAddress.getByName("0.0.0.0"));
+            UdpSocket.setBroadcast(true);
         }
-        return socket;
+        return UdpSocket;
     }
 
-    public void run() {
+    public void sendMessage(String message){
+        if (bufferOut != null && !bufferOut.checkError()){
+            bufferOut.println(message);
+            bufferOut.flush();
+        }
+    }
+
+    public void connectToServer(){
         try {
-            socket = new DatagramSocket(37020, InetAddress.getByName("0.0.0.0"));
+            UdpSocket = new DatagramSocket(37020, InetAddress.getByName("0.0.0.0"));
+            UdpSocket.setBroadcast(true);
+
+            DatagramPacket packet = new DatagramPacket(new byte[16], 16);
+
+            while (severIp == null){
+                UdpSocket.receive(packet);
+                severIp = Arrays.toString(packet.getData());
+            }
+        } catch (SocketException e) {
+            e.printStackTrace();
+        } catch (UnknownHostException e){
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            if (UdpSocket != null && UdpSocket.isConnected()){
+                UdpSocket.close();
+            }
+        }
+    }
+
+    public void received(String address) {
+        try {
+            TcpSocket = new Socket(InetAddress.getByName(address), 12345);
             mRun = true;
+            bufferOut = new PrintWriter(new BufferedWriter(new OutputStreamWriter(TcpSocket.getOutputStream())), true);
+            bufferIn = new BufferedReader(new InputStreamReader(TcpSocket.getInputStream()));
             messageListener.onConnected();
 
             while (mRun){
-                DatagramPacket packet = new DatagramPacket(new byte[1], 16);
-                socket.receive(packet);
-                severMessage = Arrays.toString(packet.getData());
+                if (bufferOut.checkError()){
+                    mRun = false;
+                }
 
-                if (severMessage != null && messageListener != null){
-                    messageListener.messageReceived(severMessage);
+                serverMessage = bufferIn.readLine();
+
+                if (serverMessage != null && messageListener != null){
+                    messageListener.messageReceived(serverMessage);
                 }
             }
         } catch (IOException e){
         } catch (UnknownError error){
         } finally {
-            if (socket != null && socket.isConnected()){
-                socket.close();
+            if (TcpSocket != null && TcpSocket.isConnected()){
+                try {
+                    TcpSocket.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
         }
 
     }
 
-    public String getSeverMessage() {
-        return severMessage;
+    public String getSeverIp() {
+        return severIp;
+    }
+
+    public String getServerMessage() {
+        return serverMessage;
     }
 
     public void stopClient(){
         mRun = false;
-        messageListener = null;
-        severMessage = null;
-        if (socket != null){
-            socket.close();
+
+        if (bufferOut != null){
+            bufferOut.flush();
+            bufferOut.close();
         }
+
+        messageListener = null;
+        bufferOut = null;
+        bufferIn = null;
+        serverMessage = null;
     }
 
     public boolean isConnect(){
-        return socket !=null && socket.isConnected();
+        return TcpSocket !=null && TcpSocket.isConnected();
     }
 
     public boolean isRunning() {
