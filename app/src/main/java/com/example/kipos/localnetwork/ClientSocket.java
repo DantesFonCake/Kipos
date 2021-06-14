@@ -1,12 +1,21 @@
 package com.example.kipos.localnetwork;
 
-import java.io.BufferedReader;
+import android.widget.Toast;
+
+import org.jetbrains.annotations.NotNull;
+
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.util.Arrays;
+
+import io.reactivex.Single;
+import io.reactivex.SingleEmitter;
+import io.reactivex.SingleOnSubscribe;
+import io.reactivex.rxjava3.annotations.NonNull;
+import io.reactivex.rxjava3.core.Observable;
+import io.reactivex.rxjava3.core.Observer;
 
 public class ClientSocket {
 
@@ -14,11 +23,9 @@ public class ClientSocket {
     private OnMessageReceived messageListener = null;
     private boolean mRun = false;
     private DatagramSocket socket;
-    private String address;
 
-    public ClientSocket(OnMessageReceived messageListener, String address) {
+    public ClientSocket(OnMessageReceived messageListener) {
         this.messageListener = messageListener;
-        this.address = address;
     }
 
     public DatagramSocket getReceivedSocket() throws IOException {
@@ -31,30 +38,40 @@ public class ClientSocket {
 
     public void run() {
         try {
+            socket = new DatagramSocket(8002, InetAddress.getByName("0.0.0.0"));
             mRun = true;
             messageListener.onConnected();
 
             while (mRun){
-               DatagramPacket packet = new DatagramPacket(new byte[1], 1);
-               socket.receive(packet);
-               severMessage = Arrays.toString(packet.getData());
+                DatagramPacket packet = new DatagramPacket(new byte[1], 16);
+                socket.receive(packet);
+                severMessage = Arrays.toString(packet.getData());
 
-               if (severMessage != null && messageListener != null){
-                   messageListener.messageReceived(severMessage);
-               }
+                if (severMessage != null && messageListener != null){
+                    messageListener.messageReceived(severMessage);
+                }
             }
         } catch (IOException e){
+        } catch (UnknownError error){
         } finally {
             if (socket != null && socket.isConnected()){
                 socket.close();
             }
         }
+
+    }
+
+    public String getSeverMessage() {
+        return severMessage;
     }
 
     public void stopClient(){
         mRun = false;
         messageListener = null;
         severMessage = null;
+        if (socket != null){
+            socket.close();
+        }
     }
 
     public boolean isConnect(){

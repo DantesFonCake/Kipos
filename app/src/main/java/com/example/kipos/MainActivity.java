@@ -3,7 +3,9 @@ package com.example.kipos;
 import android.os.Bundle;
 import android.view.View;
 import android.view.Menu;
+import android.widget.Toast;
 
+import com.example.kipos.localnetwork.ClientSocket;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.navigation.NavigationView;
 
@@ -20,6 +22,8 @@ public class MainActivity extends AppCompatActivity {
 
     private AppBarConfiguration mAppBarConfiguration;
     private ActivityMainBinding binding;
+    private ClientSocket client;
+    private AppCompatActivity MainActivity;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,6 +51,33 @@ public class MainActivity extends AppCompatActivity {
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main);
         NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
         NavigationUI.setupWithNavController(navigationView, navController);
+    }
+
+    private void connect(){
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                client = new ClientSocket(new ClientSocket.OnMessageReceived() {
+                    @Override
+                    public void onConnected() {
+
+                    }
+
+                    @Override
+                    public void messageReceived(String message) {
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                if (client.getSeverMessage() != null){
+                                    Toast.makeText(MainActivity, "message received", Toast.LENGTH_LONG).show();
+                                }
+                            }
+                        });
+                    }
+                });
+                client.run();
+            }
+        }).start();
     }
 
     @Override

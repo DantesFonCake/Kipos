@@ -35,7 +35,7 @@ public class HomeFragment extends Fragment {
         recyclerView = root.findViewById(R.id.homeRecycler);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(root.getContext()));
-        recyclerView.setAdapter(new ModuleAdapter(root.getContext(), /*взять лист модулей из телеметрии*/));
+//        recyclerView.setAdapter(new ModuleAdapter(root.getContext(), /*взять лист модулей из телеметрии*/));
 
         return root;
     }
