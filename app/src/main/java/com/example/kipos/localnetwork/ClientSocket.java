@@ -10,12 +10,6 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.util.Arrays;
 
-import io.reactivex.Single;
-import io.reactivex.SingleEmitter;
-import io.reactivex.SingleOnSubscribe;
-import io.reactivex.rxjava3.annotations.NonNull;
-import io.reactivex.rxjava3.core.Observable;
-import io.reactivex.rxjava3.core.Observer;
 
 public class ClientSocket {
 
@@ -38,7 +32,7 @@ public class ClientSocket {
 
     public void run() {
         try {
-            socket = new DatagramSocket(8002, InetAddress.getByName("0.0.0.0"));
+            socket = new DatagramSocket(37020, InetAddress.getByName("0.0.0.0"));
             mRun = true;
             messageListener.onConnected();
 
