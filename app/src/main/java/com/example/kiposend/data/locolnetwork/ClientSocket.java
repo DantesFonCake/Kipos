@@ -52,6 +52,7 @@ public class ClientSocket {
 
             UdpSocket.receive(packet);
             severIp = Arrays.toString(packet.getData());
+            messageListener.onConnected();
 
         } catch (SocketException e) {
             e.printStackTrace();
@@ -72,7 +73,6 @@ public class ClientSocket {
             mRun = true;
             bufferOut = new PrintWriter(new BufferedWriter(new OutputStreamWriter(TcpSocket.getOutputStream())), true);
             bufferIn = new BufferedReader(new InputStreamReader(TcpSocket.getInputStream()));
-            messageListener.onConnected();
 
             while (mRun){
                 if (bufferOut.checkError()){
