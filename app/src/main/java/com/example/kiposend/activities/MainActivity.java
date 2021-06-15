@@ -25,6 +25,8 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+
+        Toast.makeText(MainActivity.this, "start connect", Toast.LENGTH_SHORT).show();
         connect();
 
         RecyclerView recyclerView = findViewById(R.id.moduleRecycler);
@@ -37,17 +39,18 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void run() {
                 try {
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (client.getSeverIp() != null){
+                                Toast.makeText(MainActivity.this, "ip received", Toast.LENGTH_LONG).show();
+                            }
+                        }
+                    });
                     client = new ClientSocket(new ClientSocket.OnMessageReceived() {
                         @Override
                         public void onConnected() {
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    if (client.getSeverIp() != null){
-                                        Toast.makeText(MainActivity.this, "ip received", Toast.LENGTH_LONG).show();
-                                    }
-                                }
-                            });
+
                         }
 
                         @Override
