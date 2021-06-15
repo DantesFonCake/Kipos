@@ -43,7 +43,6 @@ public class MainActivity extends AppCompatActivity {
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
-                                    client.connectToServer();
                                     if (client.getSeverIp() != null){
                                         Toast.makeText(MainActivity.this, "ip received", Toast.LENGTH_LONG).show();
                                     }
