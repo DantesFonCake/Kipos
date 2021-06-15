@@ -29,6 +29,12 @@ public class MainActivity extends AppCompatActivity {
         Toast.makeText(MainActivity.this, "start connect", Toast.LENGTH_SHORT).show();
         connect();
 
+        if (client.getSeverIp() != null){
+            Toast.makeText(MainActivity.this, "ip received", Toast.LENGTH_LONG).show();
+        } else {
+            Toast.makeText(MainActivity.this, "ip don't received", Toast.LENGTH_LONG).show();
+        }
+
         RecyclerView recyclerView = findViewById(R.id.moduleRecycler);
         ModuleAdapter adapter = new ModuleAdapter(this, modules);
         recyclerView.setAdapter(adapter);
