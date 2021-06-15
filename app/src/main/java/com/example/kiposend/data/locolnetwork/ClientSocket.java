@@ -50,13 +50,12 @@ public class ClientSocket {
 
             DatagramPacket packet = new DatagramPacket(new byte[16], 16);
 
-            while (severIp == null){
-                UdpSocket.receive(packet);
-                severIp = Arrays.toString(packet.getData());
-            }
+            UdpSocket.receive(packet);
+            severIp = Arrays.toString(packet.getData());
+
         } catch (SocketException e) {
             e.printStackTrace();
-        } catch (UnknownHostException e){
+        } catch (UnknownHostException e) {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();

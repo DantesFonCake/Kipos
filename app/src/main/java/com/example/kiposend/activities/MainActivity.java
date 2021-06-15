@@ -25,7 +25,6 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-
         connect();
 
         RecyclerView recyclerView = findViewById(R.id.moduleRecycler);
@@ -68,7 +67,7 @@ public class MainActivity extends AppCompatActivity {
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                client.received(client.getSeverIp());
+                client.connectToServer();
             }
         }).start();
     }
