@@ -1,6 +1,7 @@
-import  requests
+import requests
 import settings
-server_url = 'http://192.168.0.6:8080/kipos'
+
+server_url = 'http://192.168.0.4:8080/kipos'
 
 
 def send_telemetry(data):
@@ -14,8 +15,8 @@ def get_settings():
 
 def check_connection():
     try:
-        resp=requests.post(server_url+"/connection_check",json={"uuid":settings.uuid})
-        answer=resp.content
-        return bool(answer)
+        resp = requests.post(server_url + "/connection_check", json = {"uuid": settings.uuid})
+        answer = resp.content
+        return answer==b"True"
     except Exception:
         return False

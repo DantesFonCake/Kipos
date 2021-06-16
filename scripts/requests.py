@@ -33,7 +33,7 @@ class Response:
             data=str(self.content,'ASCII')
             return ujson.loads(data)
         except Exception as e:
-            print(str(type(e)))
+            print(str(e))
             return {}
 
 
@@ -101,7 +101,6 @@ def request(method, url, data=None, json=None, headers={}, stream=None):
         print('OSError'+str(e))
         s.close()
         raise
-
     resp = Response(s)
     resp.status_code = status
     resp.reason = reason

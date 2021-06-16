@@ -30,10 +30,13 @@ def get_sensors_data():
             humidity_sum += sensor.humidity()
             temperature_sum += sensor.temperature()
 
-        except:
+        except Exception as e:
+            print(str(type(e)))
             humidity_sum+=0
             temperature_sum+=0
-        count += 1
+            count-=1
+        finally:
+            count += 1
     return {'temp_c':temperature_sum/count,'humidity':humidity_sum / count}
 
 
@@ -68,16 +71,15 @@ def set_lights_state(state):
         board_settings.lights_out_pin.off()
 
 
-def get_telemetry_jstring(data = None):
+def get_telemetry(data = None):
     if data is None:
         data = get_sensors_data()
-    return ujson.dumps(
-            {"telemetry":
+    return {"telemetry":
                  {"temperature"      : data["temp_c"], "humidity": data["humidity"], "water_level": read_water_level(),
                   "concentrate_level": read_concentrate_level()},
              "settings":settings.data,
              "uuid"     : settings.uuid,
-             })
+             }
 
 
 set_up()

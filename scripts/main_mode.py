@@ -19,8 +19,8 @@ import utime, ntptime
 from PID import PID
 import select
 
-wifi=network.WLAN(network.STA_IF)
-ap=network.WLAN(network.AP_IF)
+wifi = network.WLAN(network.STA_IF)
+ap = network.WLAN(network.AP_IF)
 ap.active(True)
 ap.config(essid = 'KiposModuleWiFi', password = "")
 ap.active(False)
@@ -42,20 +42,21 @@ def sensoring_routine():
     global is_on, is_file_in_use, sensoring_time
     time = utime.time()
     if time - sensoring_time > sensoring_interval:
-        print(__name__+": Sensoring")
+        print(__name__ + ": Sensoring")
         data = board.get_sensors_data()
+        print(__name__ + ": Sensors data: {}".format(data))
         t_c = temp_pid(data["temp_c"])
         board.set_heater_state(t_c > 0)
         h_c = humidity_pid(data["humidity"])
         board.set_pulverizer_state(h_c > 0)
         lights_on = settings.start_time <= utime.localtime()[3] <= settings.end_time
         board.set_lights_state(lights_on)
-        data["time"] = utime.localtime(board.get_real_time_s(time))[3:6]
+        data["time"] = time
         while (is_file_in_use):
             pass
         is_file_in_use = True
         outfile = open("telemetry_json.txt", "w")
-        outfile.write(board.get_telemetry_jstring(data))
+        outfile.write(ujson.dumps(data))
         outfile.close()
         is_file_in_use = False
         sensoring_time = time
@@ -65,30 +66,30 @@ def sensoring_routine():
 
 
 def get_broadcst_ip(wifi):
-    configs=wifi.ifconfig()
+    configs = wifi.ifconfig()
     ip = [int(i) for i in configs[2].split('.')]
     mask = [int(i) for i in configs[1].split('.')]
     return '.'.join([str((ioctet | ~moctet) & 0xff) for ioctet, moctet in zip(ip, mask)])
 
 
 def apply_data(data):
-    print(__name__+": Applying data")
+    print(__name__ + ": Applying received data")
 
     file_changed = False
     need_restart = False
 
     if "last_update_time" not in data:
-        print(__name__+": Time were not provided")
+        print(__name__ + ": Time were not provided")
         return
     time = data["last_update_time"]
 
     if time <= settings.last_update_time:
-        print(__name__+": Data is out of date")
+        print(__name__ + ": Data is out of date")
         return
 
     if "mc_settings" in data:
         need_restart = True
-        file_changed=True
+        file_changed = True
         for k in data["mc_settings"]:
             settings.data["mc_settings"][k] = data["mc_settings"][k]
 
@@ -98,11 +99,11 @@ def apply_data(data):
         file_changed = True
 
     if "uuid" in data:
-        settings.uuid=data["uuid"]
-        file_changed=True
+        settings.uuid = data["uuid"]
+        file_changed = True
 
     if file_changed:
-        settings.data["last_update_time"]=time
+        settings.data["last_update_time"] = time
         settings.rewrite_settings_file()
         settings.reassign_data()
     if need_restart:
@@ -126,7 +127,7 @@ def local_net_mode(wifi):
     broadcast_sock.settimeout(0.2)
     ip = wifi.ifconfig()[0]
     message = bytes(ip, 'ASCII')
-    ip=get_broadcst_ip(wifi)
+    ip = get_broadcst_ip(wifi)
     print(__name__ + ": Sending broadcast to " + ip)
     broadcast_sock.sendto(message, (ip, 37020))
     print(__name__ + ": Broadcast sent")
@@ -140,22 +141,23 @@ def local_net_mode(wifi):
             try:
                 print(__name__ + ": Parsing received data")
                 data = ujson.loads(strdata)
-                print(__name__ + ": Applying received data")
                 apply_data(data)
             except:
                 print(__name__ + ": Exception in parsing " + strdata)
-            # if r[0][1] & select.POLLOUT:
             print(__name__ + ": Sending data")
-            while (is_file_in_use):
-                pass
-            is_file_in_use = True
-            print(__name__ + ": File reading")
-            outfile = open("telemetry_json.txt", "r")
-            data = outfile.read()
-            outfile.close()
-            is_file_in_use = False
-            conn.write(bytes(data, 'ASCII'))
-            print(__name__ + ": Data sent")
+            try:
+                while (is_file_in_use):
+                    pass
+                is_file_in_use = True
+                print(__name__ + ": File reading")
+                outfile = open("telemetry_json.txt")
+                data = ujson.load(outfile)
+                outfile.close()
+                is_file_in_use = False
+                conn.write(bytes(ujson.dumps(board.get_telemetry(data)), 'ASCII'))
+                print(__name__ + ": Data sent")
+            except Exception as e:
+                print(__name__+": Exception in sending data "+str(e))
         print(__name__ + ": Closing connection")
         conn.close()
         del conn
@@ -169,25 +171,26 @@ def local_net_mode(wifi):
 
 
 def networking_routine():
-    global is_on, server_url, is_file_in_use, networking_time, is_local_mode, is_in_access_mode,wifi,ap
+    global is_on, server_url, is_file_in_use, networking_time, is_local_mode, is_in_access_mode, wifi, ap
     time = utime.time()
     if time - networking_time > networking_interval:
         print(__name__ + ": Checking internet connection")
         try:
-            if ~is_in_access_mode and settings.uuid!=-1 and mc_server_protocol.check_connection():
-                is_local_mode=False
+            if ~is_in_access_mode and settings.uuid != -1 and mc_server_protocol.check_connection():
+                is_local_mode = False
                 print(__name__ + ": Have connection")
                 while is_file_in_use:
                     pass
                 is_file_in_use = True
-                t_file = open("telemetry_json.txt", "r")
+                t_file = open("telemetry_json.txt")
                 data = ujson.load(t_file)
                 t_file.close()
                 is_file_in_use = False
-                response = mc_server_protocol.send_telemetry(data)
+                print(__name__+": Sending data to server")
+                response = mc_server_protocol.send_telemetry(board.get_telemetry(data))
                 apply_data(response.json())
             else:
-                print(__name__+": Failed to connect to server")
+                print(__name__ + ": Can't establish connection to server")
                 if wifi.isconnected():
                     ap.active(False)
                     is_local_mode = True
@@ -199,20 +202,20 @@ def networking_routine():
 
             if is_local_mode:
                 if is_in_access_mode:
-                    print(__name__+": Using access mode")
+                    print(__name__ + ": Using access mode")
                     local_net_mode(ap)
                 else:
-                    print(__name__+": Using local network")
+                    print(__name__ + ": Using local network")
                     local_net_mode(wifi)
         except Exception as e:
-            print(__name__+": "+str(type(e)))
+            print(__name__ + ": " + str(e))
         finally:
             networking_time = time
 
 
 def enter():
     global broadcast_ip, is_local_mode, is_in_access_mode, wifi, ap
-    if settings.wifi_ssid!=None:
+    if settings.wifi_ssid != None:
         wifi.active(True)
         while not wifi.active():
             pass
@@ -235,7 +238,7 @@ def enter():
         except:
             print(__name__ + ": Exception in setting real time")
     else:
-        is_in_access_mode=True
+        is_in_access_mode = True
     while is_on:
         sensoring_routine()
         networking_routine()
