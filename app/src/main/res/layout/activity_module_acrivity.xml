@@ -4,6 +4,114 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/kipos"
     tools:context=".activities.ModuleActivity">
+
+    <TextView
+        android:id="@+id/nameMod"
+        style="@style/TextAppearance.MaterialComponents.Headline5"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:text="TextView"
+        android:textColor="@color/white"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/lvlHim"
+        style="@style/TextAppearance.MaterialComponents.Headline5"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="TextView"
+        android:textColor="@color/white"
+        app:layout_constraintStart_toStartOf="@+id/nameMod"
+        app:layout_constraintTop_toBottomOf="@+id/nameMod" />
+
+    <TextView
+        android:id="@+id/temperature"
+        style="@style/TextAppearance.MaterialComponents.Headline5"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="TextView"
+        android:textColor="@color/white"
+        android:textColorHighlight="@color/teal_700"
+        app:layout_constraintStart_toStartOf="@+id/targetHim"
+        app:layout_constraintTop_toBottomOf="@+id/targetHim" />
+
+    <TextView
+        android:id="@+id/lvlWater"
+        style="@style/TextAppearance.MaterialComponents.Headline5"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="TextView"
+        android:textColor="@color/white"
+        app:layout_constraintStart_toStartOf="@+id/targetTemparature"
+        app:layout_constraintTop_toBottomOf="@+id/targetTemparature" />
+
+    <TextView
+        android:id="@+id/lvlConcentrate"
+        style="@style/TextAppearance.MaterialComponents.Headline5"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="TextView"
+        android:textColor="@color/white"
+        app:layout_constraintStart_toStartOf="@+id/lvlWater"
+        app:layout_constraintTop_toBottomOf="@+id/lvlWater" />
+
+    <EditText
+        android:id="@+id/targetHim"
+        style="@android:style/Widget.Material.Light.EditText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:ems="10"
+        android:inputType="number"
+        android:textColor="@color/white"
+        app:layout_constraintStart_toStartOf="@+id/lvlHim"
+        app:layout_constraintTop_toBottomOf="@+id/lvlHim" />
+
+    <EditText
+        android:id="@+id/targetTemparature"
+        style="@android:style/Widget.Material.Light.EditText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:ems="10"
+        android:inputType="number"
+        android:textColor="@color/white"
+        app:layout_constraintStart_toStartOf="@+id/temperature"
+        app:layout_constraintTop_toBottomOf="@+id/temperature" />
+
+    <EditText
+        android:id="@+id/nameWifi"
+        style="@android:style/Widget.Material.Light.EditText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:ems="10"
+        android:inputType="textPersonName"
+        android:textColor="@color/white"
+        android:textColorHint="@color/white"
+        app:layout_constraintStart_toStartOf="@+id/lvlConcentrate"
+        app:layout_constraintTop_toBottomOf="@+id/lvlConcentrate" />
+
+    <EditText
+        android:id="@+id/wifiPas"
+        style="@android:style/Widget.Material.Light.EditText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:ems="10"
+        android:inputType="textPassword"
+        android:textColor="@color/white"
+        android:textColorHint="@color/white"
+        app:layout_constraintStart_toStartOf="@+id/nameWifi"
+        app:layout_constraintTop_toBottomOf="@+id/nameWifi" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

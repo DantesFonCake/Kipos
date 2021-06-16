@@ -16,11 +16,17 @@ import org.jetbrains.annotations.NotNull;
 import java.util.List;
 
 public class ModuleAdapter extends RecyclerView.Adapter<ModuleAdapter.ViewHolder>{
+
+    public interface OnModuleClickListener{
+        void onModuleClick(Module module, int position);
+    }
+
+    private final OnModuleClickListener onClickListener;
     private final LayoutInflater inflater;
     private List<Module> moduleList;
 
-
-    public ModuleAdapter(Context context, List<Module> moduleList) {
+    public ModuleAdapter(Context context, List<Module> moduleList, OnModuleClickListener onClickListener) {
+        this.onClickListener = onClickListener;
         this.inflater = LayoutInflater.from(context);
         this.moduleList = moduleList;
     }
@@ -42,18 +48,25 @@ public class ModuleAdapter extends RecyclerView.Adapter<ModuleAdapter.ViewHolder
         //передаем к карточку имя модуля
         holder.nameView.setText(module.getName());
         //передаем статус
-        if (module.lvlHumidity <= module.targetHumidity/2){
-            holder.statusView.setText("low humidity");
-        } else if (module.lvlConcentrate <= 20){
-            holder.statusView.setText("low concentrate");
-        } else if (module.temperature <= module.targetTemperature/2){
-            holder.statusView.setText("low temperature");
-        } else if (module.lvlWater <= 20){
-            holder.statusView.setText("low level water");
-        } else {
-            holder.statusView.setText("OK");
-        }
+        holder.statusView.setText(module.getWifiName());
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onClickListener.onModuleClick(module, position);
+            }
+        });
 
+//        if (module.lvlHumidity <= module.targetHumidity/2){
+//            holder.statusView.setText("low humidity");
+//        } else if (module.lvlConcentrate <= 20){
+//            holder.statusView.setText("low concentrate");
+//        } else if (module.temperature <= module.targetTemperature/2){
+//            holder.statusView.setText("low temperature");
+//        } else if (module.lvlWater <= 20){
+//            holder.statusView.setText("low level water");
+//        } else {
+//
+//        }
     }
 
     @Override

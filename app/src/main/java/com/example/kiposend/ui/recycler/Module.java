@@ -2,18 +2,17 @@ package com.example.kiposend.ui.recycler;
 
 import androidx.annotation.Nullable;
 
-import com.example.kiposend.data.json.telemetry.Telemetry;
 
 public class Module {
     public String name;
-    public float lvlHumidity = Telemetry.message.humidity;
+    public float lvlHumidity;
     public int targetHumidity;
-    public float temperature = Telemetry.message.temperature;
+    public float temperature;
     public int targetTemperature;
     @Nullable
-    public float lvlWater = Telemetry.message.waterLvl;
+    public float lvlWater;
     @Nullable
-    public float lvlConcentrate = Telemetry.message.concentrLvl;
+    public float lvlConcentrate;
     public String wifiName;
     public String wifiPass;
 
@@ -99,5 +98,20 @@ public class Module {
 
     public void setWifiPass(String wifiPass) {
         this.wifiPass = wifiPass;
+    }
+
+    @Override
+    public String toString() {
+        return "Module{" +
+                "name='" + name + '\'' +
+                ", lvlHumidity=" + lvlHumidity +
+                ", targetHumidity=" + targetHumidity +
+                ", temperature=" + temperature +
+                ", targetTemperature=" + targetTemperature +
+                ", lvlWater=" + lvlWater +
+                ", lvlConcentrate=" + lvlConcentrate +
+                ", wifiName='" + wifiName + '\'' +
+                ", wifiPass='" + wifiPass + '\'' +
+                '}';
     }
 }

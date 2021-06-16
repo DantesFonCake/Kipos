@@ -1,24 +1,28 @@
 package com.example.kiposend.activities;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Toast;
 
 import com.example.kiposend.R;
 import com.example.kiposend.data.locolnetwork.ClientSocket;
+import com.example.kiposend.data.locolnetwork.UdpSweeper;
 import com.example.kiposend.ui.recycler.Module;
 import com.example.kiposend.ui.recycler.ModuleAdapter;
 
-import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Timer;
 
 public class MainActivity extends AppCompatActivity {
 
     ArrayList<Module> modules = new ArrayList<Module>();
     private ClientSocket client;
-    private String serverMessage;
+    private UdpSweeper udpSweeper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,61 +30,48 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
 
-        Toast.makeText(MainActivity.this, "start connect", Toast.LENGTH_SHORT).show();
-        connect();
+        //Toast.makeText(MainActivity.this, "start connect", Toast.LENGTH_SHORT).show();
+        //connect();
 
-        if (client.getSeverIp() != null){
-            Toast.makeText(MainActivity.this, "ip received", Toast.LENGTH_LONG).show();
-        } else {
-            Toast.makeText(MainActivity.this, "ip don't received", Toast.LENGTH_LONG).show();
-        }
+        setInitData();
+        RecyclerView recyclerView = (RecyclerView) findViewById(R.id.moduleRecycler);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
-        RecyclerView recyclerView = findViewById(R.id.moduleRecycler);
-        ModuleAdapter adapter = new ModuleAdapter(this, modules);
+
+        ModuleAdapter.OnModuleClickListener moduleClickListener = new ModuleAdapter.OnModuleClickListener() {
+            @Override
+            public void onModuleClick(Module module, int position) {
+                Intent intent = new Intent(MainActivity.this, ModuleActivity.class);
+                intent.putExtra("name", module.name);
+                intent.putExtra("lvlHim", module.lvlHumidity);
+                intent.putExtra("targetHim", module.targetHumidity);
+                intent.putExtra("temp", module.temperature);
+                intent.putExtra("targetTemp", module.targetTemperature);
+                intent.putExtra("lvlWater", module.lvlWater);
+                intent.putExtra("lvlCon", module.lvlConcentrate);
+                intent.putExtra("wifiName", module.wifiName);
+                intent.putExtra("wifiPas", module.wifiPass);
+                startActivity(intent);
+            }
+        };
+
+        ModuleAdapter adapter = new ModuleAdapter(this, modules, moduleClickListener);
         recyclerView.setAdapter(adapter);
     }
 
     private void connect(){
+        udpSweeper.start();
+
         new Thread(new Runnable() {
             @Override
             public void run() {
-                try {
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            if (client.getSeverIp() != null){
-                                Toast.makeText(MainActivity.this, "ip received", Toast.LENGTH_LONG).show();
-                            }
-                        }
-                    });
-                    client = new ClientSocket(new ClientSocket.OnMessageReceived() {
-                        @Override
-                        public void onConnected() {
 
-                        }
-
-                        @Override
-                        public void messageReceived(String message) {
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    client.received(client.getSeverIp());
-                                    if (client.getServerMessage() != null){
-                                        serverMessage = client.getServerMessage();
-                                    }
-                                }
-                            });
-                        }
-                    });
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                client.connectToServer();
             }
         }).start();
     }
 
     private void setInitData(){
-
+        modules.add(new Module("Angel", 85, 90, 30, 29, 50, 50, "Example", "12345678"));
+        modules.add(new Module("Doom", 60, 49, 45, 16, 90, 79, "WiFi", "19242642"));
     }
 }
