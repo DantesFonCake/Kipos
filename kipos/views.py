@@ -17,10 +17,13 @@ from .forms import KiposUserCreationForm
 from .models import KiposUser, Module
 
 logger=logging.getLogger(__name__)
+@csrf_exempt
 def check_connection(request):
     if request.method=='POST':
-        if 'uuid' in request.POST and request.POST['uuid']!=-1:
-            return HttpResponse(True and ~Module.objects.get(uuid=request.POST['uuid']).forced_local_mode)
+        data=json.loads(request.body)
+        if 'uuid' in data and data['uuid']!=-1:
+            #logger.log(logging.DEBUG,data['uuid'])
+            return HttpResponse(not Module.objects.get(uuid=data['uuid']).forced_local_mode)
     return HttpResponse(False)
 
 @csrf_exempt
@@ -39,7 +42,7 @@ def update(request):
                 if 'last_update_time' in data['settings']:
                     if data['settings']['last_update_time']==-1:
                         module.settings=data['settings']
-                        module.settings['last_update_settings']=int(time.time())
+                        module.settings['last_update_time']=int(time.time())
                         changed=True
                     if module.settings['last_update_time']<data['settings']['last_update_time']:
                         module.settings=data['settings']
