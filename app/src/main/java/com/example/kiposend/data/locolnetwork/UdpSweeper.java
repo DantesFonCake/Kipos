@@ -46,11 +46,21 @@ public class UdpSweeper extends Thread{
         DatagramPacket packet = new DatagramPacket(new byte[bufferSize], bufferSize);
         try {
             sock = new DatagramSocket(port);
+        } catch (SocketException e) {
+            e.printStackTrace();
+            throw new RuntimeException(String.format("Failed to bind socket to port: %d ,", port) + e.getMessage());
+        }
+        try {
             sock.setBroadcast(true);
+        } catch (SocketException e) {
+            e.printStackTrace();
+            throw new RuntimeException("Failed to set SO_BROADCAST, " + e.getMessage());
+        }
+        try {
             sock.setSoTimeout(1000);
         } catch (SocketException e) {
             e.printStackTrace();
-            throw new RuntimeException(String.format("Failed to bind socket to port: %d", port));
+            throw new RuntimeException("Failed to set SO_TIMEOUT, " + e.getMessage());
         }
         boolean getTimeout;
         while (Running) {

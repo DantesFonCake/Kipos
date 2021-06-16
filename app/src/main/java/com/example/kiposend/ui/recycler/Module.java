@@ -1,22 +1,25 @@
 package com.example.kiposend.ui.recycler;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import androidx.annotation.Nullable;
 
 
-public class Module {
+public class Module implements Parcelable {
     public String name;
-    public float lvlHumidity;
+    public int lvlHumidity;
     public int targetHumidity;
-    public float temperature;
+    public int temperature;
     public int targetTemperature;
     @Nullable
-    public float lvlWater;
+    public int lvlWater;
     @Nullable
-    public float lvlConcentrate;
+    public int lvlConcentrate;
     public String wifiName;
     public String wifiPass;
 
-    public Module(String name, float lvlHumidity, int targetHumidity, float temperature, int targetTemperature, float lvlWater, float lvlConcentrate, String wifiName, String wifiPass) {
+    public Module(String name, int lvlHumidity, int targetHumidity, int temperature, int targetTemperature, int lvlWater, int lvlConcentrate, String wifiName, String wifiPass) {
         this.name = name;
         this.lvlHumidity = lvlHumidity;
         this.targetHumidity = targetHumidity;
@@ -26,6 +29,18 @@ public class Module {
         this.lvlConcentrate = lvlConcentrate;
         this.wifiName = wifiName;
         this.wifiPass = wifiPass;
+    }
+
+    public Module(Parcel source) {
+        name = source.readString();
+        lvlHumidity = source.readInt();
+        targetHumidity = source.readInt();
+        temperature = source.readInt();
+        targetTemperature = source.readInt();
+        lvlWater = source.readInt();
+        lvlConcentrate = source.readInt();
+        wifiName = source.readString();
+        wifiPass = source.readString();
     }
 
     public String getName() {
@@ -40,7 +55,7 @@ public class Module {
         return lvlHumidity;
     }
 
-    public void setLvlHumidity(float lvlHumidity) {
+    public void setLvlHumidity(int lvlHumidity) {
         this.lvlHumidity = lvlHumidity;
     }
 
@@ -56,7 +71,7 @@ public class Module {
         return temperature;
     }
 
-    public void setTemperature(float temperature) {
+    public void setTemperature(int temperature) {
         this.temperature = temperature;
     }
 
@@ -72,7 +87,7 @@ public class Module {
         return lvlWater;
     }
 
-    public void setLvlWater(float lvlWater) {
+    public void setLvlWater(int lvlWater) {
         this.lvlWater = lvlWater;
     }
 
@@ -80,7 +95,7 @@ public class Module {
         return lvlConcentrate;
     }
 
-    public void setLvlConcentrate(float lvlConcentrate) {
+    public void setLvlConcentrate(int lvlConcentrate) {
         this.lvlConcentrate = lvlConcentrate;
     }
 
@@ -114,4 +129,35 @@ public class Module {
                 ", wifiPass='" + wifiPass + '\'' +
                 '}';
     }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(name);
+        dest.writeFloat(lvlHumidity);
+        dest.writeInt(targetHumidity);
+        dest.writeFloat(temperature);
+        dest.writeInt(targetTemperature);
+        dest.writeFloat(lvlWater);
+        dest.writeFloat(lvlConcentrate);
+        dest.writeString(wifiName);
+        dest.writeString(wifiPass);
+    }
+
+    public static final Parcelable.Creator<Module> CREATOR = new Parcelable.Creator<Module>(){
+
+        @Override
+        public Module createFromParcel(Parcel source) {
+            return new Module(source);
+        }
+
+        @Override
+        public Module[] newArray(int size) {
+            return new Module[size];
+        }
+    };
 }

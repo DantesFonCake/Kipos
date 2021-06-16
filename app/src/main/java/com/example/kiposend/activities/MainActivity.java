@@ -6,6 +6,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.widget.Toast;
 
 import com.example.kiposend.R;
@@ -30,8 +31,8 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
 
-        //Toast.makeText(MainActivity.this, "start connect", Toast.LENGTH_SHORT).show();
-        //connect();
+//        Toast.makeText(MainActivity.this, "start connect", Toast.LENGTH_SHORT).show();
+//        connect();
 
         setInitData();
         RecyclerView recyclerView = (RecyclerView) findViewById(R.id.moduleRecycler);
@@ -42,15 +43,8 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onModuleClick(Module module, int position) {
                 Intent intent = new Intent(MainActivity.this, ModuleActivity.class);
-                intent.putExtra("name", module.name);
-                intent.putExtra("lvlHim", module.lvlHumidity);
-                intent.putExtra("targetHim", module.targetHumidity);
-                intent.putExtra("temp", module.temperature);
-                intent.putExtra("targetTemp", module.targetTemperature);
-                intent.putExtra("lvlWater", module.lvlWater);
-                intent.putExtra("lvlCon", module.lvlConcentrate);
-                intent.putExtra("wifiName", module.wifiName);
-                intent.putExtra("wifiPas", module.wifiPass);
+                intent.putExtra("name", module);
+
                 startActivity(intent);
             }
         };
@@ -60,18 +54,20 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void connect(){
+
+        udpSweeper = new UdpSweeper(37020, 16, 30);
         udpSweeper.start();
 
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-
-            }
-        }).start();
+//        new Thread(new Runnable() {
+//            @Override
+//            public void run() {
+//
+//            }
+//        }).start();
     }
 
     private void setInitData(){
-        modules.add(new Module("Angel", 85, 90, 30, 29, 50, 50, "Example", "12345678"));
-        modules.add(new Module("Doom", 60, 49, 45, 16, 90, 79, "WiFi", "19242642"));
+        modules.add(new Module("Angel",  85, 90,  30, 29, 50, 50, "Example", "12345678"));
+        modules.add(new Module("Doom",  60, 49,  45, 16, 90, 79, "WiFi", "19242642"));
     }
 }
